@@ -1,0 +1,84 @@
+// --------------------------------------
+// i2c_scanner
+//
+// Version 1
+//    This program (or code that looks like it)
+//    can be found in many places.
+//    For example on the Arduino.cc forum.
+//    The original author is not know.
+// Version 2, Juni 2012, Using Arduino 1.0.1
+//     Adapted to be as simple as possible by Arduino.cc user Krodal
+// Version 3, Feb 26  2013
+//    V3 by louarnold
+// Version 4, March 3, 2013, Using Arduino 1.0.3
+//    by Arduino.cc user Krodal.
+//    Changes by louarnold removed.
+//    Scanning addresses changed from 0...127 to 1...119,
+//    according to the i2c scanner by Nick Gammon
+//    https://www.gammon.com.au/forum/?id=10896
+// Version 5, March 28, 2013
+//    As version 4, but address scans now to 127.
+//    A sensor seems to use address 120.
+// Version 6, November 27, 2015.
+//    Added waiting for the Leonardo serial communication.
+//
+//
+// This sketch tests the standard 7-bit addresses
+// Devices with higher bit address might not be seen properly.
+//
+ 
+#include <Wire.h>
+#include <Arduino.h>
+#include <LovyanGFXS3Setup.hpp>
+#include <Adafruit_PWMServoDriver.h>
+void setServoPulse(uint8_t, double);
+LGFX display;
+static int32_t touchX, touchY;
+// #include <LovyanGFX.hpp>
+extern const unsigned short robot[];
+static LGFX lcd;
+static LGFX_Sprite canvas;    // オフスクリーン描画用バッファ
+static LGFX_Sprite sprite1; // 時計の文字盤パーツ
+int height = 0;
+
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+
+
+
+void setup(void)
+{
+ // Analog servos run at ~50 Hz updates
+
+  delay(10);
+  lcd.init();
+  lcd.setRotation(1);
+  lcd.clear(TFT_BLACK);
+  lcd.setBrightness(255);
+
+  sprite1.setColorDepth(8);
+
+  sprite1.setSwapBytes(true);
+  canvas.setSwapBytes(true);
+  uint16_t calData[8] = {221, 3923, 173, 199, 3839, 3906, 3850, 215};
+  lcd.setTouchCalibrate(calData);
+
+  lcd.startWrite();
+  // why does it only let me make the sprite 230 wide?
+  canvas.setTextColor(TFT_WHITE, TFT_BLACK);
+  canvas.setTextSize(5);
+  sprite1.setTextSize(3);
+  
+  sprite1.createSprite(100, 300);
+  canvas.createSprite(419, 319); // Maximum sprite size is 57,120 pixels
+}
+void loop()
+{
+ 
+  lcd.getTouch(&touchX, &touchY);
+  canvas.fillScreen(TFT_BLACK);
+  sprite1.pushImage(0,0, 100,touchY,robot);
+  sprite1.pushSprite(&canvas, 0, 0);
+  canvas.pushSprite(&lcd, 0, 0);
+  sprite1.clear();
+  
+}

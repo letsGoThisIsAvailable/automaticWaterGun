@@ -1,0 +1,19 @@
+#include <Ultrasonic.h>
+#include <Arduino.h>
+int mappedValue;
+int distance;
+Ultrasonic ultrasonic(13, 15);
+
+void setup(void)
+{
+ Serial.begin(115200);
+}
+void loop(void)
+{
+  distance = ultrasonic.read();
+  if(distance < 10){
+    distance = 10;
+  }
+  mappedValue = map(distance, 10, 357, 0, 50);
+  Serial.println(mappedValue);
+}
