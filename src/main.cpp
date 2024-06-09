@@ -73,8 +73,7 @@ void loop(void)
   userInputOnIfCalibrationIsGood = 2;
   while (userInputOnIfCalibrationIsGood == 2)
   {
-    lcd.clear();
-    lcd.setCursor(0, 0);
+=    lcd.setCursor(0, 0);
     textToLcd("Press any button to begin calibration");
     waitForAnyButtonPress();
 
